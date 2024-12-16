@@ -88,7 +88,7 @@ function moveWTCs() {
 // Function to update the score display
 function updateScore() {
     const scoreDisplay = document.getElementById('score');
-    scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
+    scoreDisplay.textContent = `${score.toString().padStart(5, '0')}`;
 }
 
 // Set initial styles and start the game
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreDisplay.style.fontSize = '50px';
     scoreDisplay.style.color = 'black';
     scoreDisplay.style.fontFamily = 'Hachicro, "Undertale Battle Font", sans-serif';
-    scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
+    scoreDisplay.textContent = `${score.toString().padStart(5, '0')}`;
     game.appendChild(scoreDisplay);
 
     // Set the plane styles to use the image
