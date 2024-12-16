@@ -88,7 +88,7 @@ function moveWTCs() {
 // Function to update the score display
 function updateScore() {
     const scoreDisplay = document.getElementById('score');
-    scoreDisplay.textContent = `${score.toString().padStart(15, '0')}`;
+    scoreDisplay.textContent = `${score.toString().padStart(5, '0')}`;
 }
 
 // Set initial styles and start the game
