@@ -8,6 +8,7 @@ let speed = 5; // Initial speed of the obstacles
 let spawnInterval = 2000; // Interval in milliseconds to spawn new WTCs
 
 const obstacles = []; // Array to hold all WTC elements
+const bullets = []; // Array to hold bullets
 
 // Add an event listener to handle key presses
 document.addEventListener('keydown', (event) => {
@@ -21,11 +22,54 @@ document.addEventListener('keydown', (event) => {
     } else if (event.key === 'ArrowDown' || event.key === 's') {
         // Move the plane down, ensuring it doesn't go below the game boundary
         planePosition = Math.min(gameHeight - planeHeight, planePosition + step);
+    } else if (event.key === ' ') {
+        // Shoot a bullet when space is pressed
+        shootBullet();
     }
 
     // Update the plane's position
     plane.style.top = `${planePosition}px`;
 });
+
+// Function to shoot a bullet
+function shootBullet() {
+    const game = document.getElementById('game');
+    const bullet = document.createElement('div');
+    bullet.classList.add('bullet');
+    bullet.style.position = 'absolute';
+    bullet.style.width = '10px';
+    bullet.style.height = '5px';
+    bullet.style.backgroundColor = 'red';
+    bullet.style.left = '130px'; // Slightly ahead of the plane
+    bullet.style.top = `${planePosition + 37}px`; // Align bullet with plane's center
+    
+    const shootSound = new Audio('assets/shoot_sound.mp3'); // Load sound effect
+    shootSound.volume = 1.0; // Loud volume
+    shootSound.play();
+    
+    game.appendChild(bullet);
+    bullets.push(bullet);
+}
+
+// Function to move bullets
+function moveBullets() {
+    const game = document.getElementById('game');
+
+    bullets.forEach((bullet, index) => {
+        let bulletPosition = parseInt(bullet.style.left);
+        bulletPosition += 10; // Move bullet to the right
+
+        if (bulletPosition > game.clientWidth) {
+            // Remove bullet if it goes off-screen
+            game.removeChild(bullet);
+            bullets.splice(index, 1);
+        } else {
+            bullet.style.left = `${bulletPosition}px`;
+        }
+    });
+
+    requestAnimationFrame(moveBullets);
+}
 
 // Function to create a new WTC element
 function createWTC() {
@@ -33,13 +77,17 @@ function createWTC() {
     const wtc = document.createElement('div');
     wtc.classList.add('wtc');
     wtc.style.position = 'absolute';
-    wtc.style.width = '128px';
-    wtc.style.height = '128px';
+
+    // Randomly decide the WTC size (128x128 or 256x256)
+    const size = Math.random() > 0.5 ? 128 : 256;
+    wtc.style.width = `${size}px`;
+    wtc.style.height = `${size}px`;
+
     wtc.style.backgroundImage = 'url("assets/twin_towers.png")';
     wtc.style.backgroundSize = 'cover';
     wtc.style.backgroundRepeat = 'no-repeat';
     wtc.style.left = `${game.clientWidth}px`;
-    wtc.style.top = `${Math.random() * (game.clientHeight - 128)}px`;
+    wtc.style.top = `${Math.random() * (game.clientHeight - size)}px`;
     game.appendChild(wtc);
     obstacles.push(wtc);
 }
@@ -55,7 +103,7 @@ function moveWTCs() {
 
         // Move WTC to the left
         wtcPosition -= speed;
-        if (wtcPosition < -128) {
+        if (wtcPosition < -256) {
             // Remove WTC if it goes off-screen
             game.removeChild(wtc);
             obstacles.splice(index, 1);
@@ -88,7 +136,7 @@ function moveWTCs() {
 // Function to update the score display
 function updateScore() {
     const scoreDisplay = document.getElementById('score');
-    scoreDisplay.textContent = `${score.toString().padStart(5, '0')}`;
+    scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
 }
 
 // Set initial styles and start the game
@@ -104,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreDisplay.style.fontSize = '50px';
     scoreDisplay.style.color = 'black';
     scoreDisplay.style.fontFamily = 'Hachicro, "Undertale Battle Font", sans-serif';
-    scoreDisplay.textContent = `${score.toString().padStart(5, '0')}`;
+    scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
     game.appendChild(scoreDisplay);
 
     // Set the plane styles to use the image
@@ -122,4 +170,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Start moving the WTCs
     moveWTCs();
+    moveBullets();
 });
