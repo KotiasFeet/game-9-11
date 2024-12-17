@@ -9,6 +9,9 @@ let spawnInterval = 2000; // Interval in milliseconds to spawn new WTCs
 
 const obstacles = []; // Array to hold all WTC elements
 const bullets = []; // Array to hold bullets
+let shootTextDisplayed = true; // Track if the shoot message is displayed
+let moveUpTextDisplayed = true; // Track if 'Move Up' message is displayed
+let moveDownTextDisplayed = true; // Track if 'Move Down' message is displayed
 
 // Add an event listener to handle key presses
 document.addEventListener('keydown', (event) => {
@@ -19,12 +22,39 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'ArrowUp' || event.key === 'w') {
         // Move the plane up, ensuring it doesn't go above the game boundary
         planePosition = Math.max(0, planePosition - step);
+
+        // Remove the 'Press A to Move Up' text if displayed
+        if (moveUpTextDisplayed) {
+            const moveUpText = document.getElementById('moveUpText');
+            if (moveUpText) {
+                moveUpText.remove();
+                moveUpTextDisplayed = false;
+            }
+        }
     } else if (event.key === 'ArrowDown' || event.key === 's') {
         // Move the plane down, ensuring it doesn't go below the game boundary
         planePosition = Math.min(gameHeight - planeHeight, planePosition + step);
+
+        // Remove the 'Press S to Move Down' text if displayed
+        if (moveDownTextDisplayed) {
+            const moveDownText = document.getElementById('moveDownText');
+            if (moveDownText) {
+                moveDownText.remove();
+                moveDownTextDisplayed = false;
+            }
+        }
     } else if (event.key === ' ') {
         // Shoot a bullet when space is pressed
         shootBullet();
+
+        // Remove the 'Press Space to Shoot' text if displayed
+        if (shootTextDisplayed) {
+            const shootText = document.getElementById('shootText');
+            if (shootText) {
+                shootText.remove();
+                shootTextDisplayed = false;
+            }
+        }
     }
 
     // Update the plane's position
@@ -78,8 +108,8 @@ function createWTC() {
     wtc.classList.add('wtc');
     wtc.style.position = 'absolute';
 
-    // Randomly decide the WTC size (128x128 or 256x256)
-    const size = Math.random() > 0.5 ? 128 : 256;
+    // Randomly decide the WTC size (from 128 to 256)
+    const size = Math.floor(Math.random() * (256 - 128 + 1)) + 128;
     wtc.style.width = `${size}px`;
     wtc.style.height = `${size}px`;
 
@@ -126,8 +156,11 @@ function moveWTCs() {
         }
     });
 
-    // Gradually increase speed over time
+    // Gradually increase speed and reduce spawn interval over time
     speed += 0.001;
+    if (spawnInterval > 500) {
+        spawnInterval -= 5;
+    }
 
     // Continue moving
     requestAnimationFrame(moveWTCs);
@@ -155,6 +188,45 @@ document.addEventListener('DOMContentLoaded', () => {
     scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
     game.appendChild(scoreDisplay);
 
+    // Create and style the 'Press Space to Shoot' message
+    const shootText = document.createElement('div');
+    shootText.id = 'shootText';
+    shootText.style.position = 'absolute';
+    shootText.style.top = '40%';
+    shootText.style.left = '50%';
+    shootText.style.transform = 'translate(-50%, -50%)';
+    shootText.style.fontSize = '30px';
+    shootText.style.color = 'red';
+    shootText.style.fontFamily = 'Hachicro, "Undertale Battle Font", sans-serif';
+    shootText.textContent = "PRESS 'SPACE' TO SHOOT";
+    game.appendChild(shootText);
+
+    // Create and style the 'Press A to Move Up' message
+    const moveUpText = document.createElement('div');
+    moveUpText.id = 'moveUpText';
+    moveUpText.style.position = 'absolute';
+    moveUpText.style.top = '45%';
+    moveUpText.style.left = '50%';
+    moveUpText.style.transform = 'translate(-50%, -50%)';
+    moveUpText.style.fontSize = '30px';
+    moveUpText.style.color = 'blue';
+    moveUpText.style.fontFamily = 'Hachicro, "Undertale Battle Font", sans-serif';
+    moveUpText.textContent = "PRESS 'A' TO MOVE UP";
+    game.appendChild(moveUpText);
+
+    // Create and style the 'Press S to Move Down' message
+    const moveDownText = document.createElement('div');
+    moveDownText.id = 'moveDownText';
+    moveDownText.style.position = 'absolute';
+    moveDownText.style.top = '50%';
+    moveDownText.style.left = '50%';
+    moveDownText.style.transform = 'translate(-50%, -50%)';
+    moveDownText.style.fontSize = '30px';
+    moveDownText.style.color = 'green';
+    moveDownText.style.fontFamily = 'Hachicro, "Undertale Battle Font", sans-serif';
+    moveDownText.textContent = "PRESS 'S' TO MOVE DOWN";
+    game.appendChild(moveDownText);
+
     // Set the plane styles to use the image
     plane.style.position = 'absolute';
     plane.style.top = `${planePosition}px`;
@@ -166,7 +238,9 @@ document.addEventListener('DOMContentLoaded', () => {
     plane.style.backgroundRepeat = 'no-repeat';
 
     // Spawn WTCs at regular intervals
-    setInterval(createWTC, spawnInterval);
+    setInterval(() => {
+        createWTC();
+    }, spawnInterval);
 
     // Start moving the WTCs
     moveWTCs();
