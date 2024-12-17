@@ -157,10 +157,7 @@ function moveWTCs() {
     });
 
     // Gradually increase speed and reduce spawn interval over time
-    speed += 0.001;
-    if (spawnInterval > 500) {
-        spawnInterval -= 5;
-    }
+    speed += 0.01;
 
     // Continue moving
     requestAnimationFrame(moveWTCs);
@@ -170,6 +167,20 @@ function moveWTCs() {
 function updateScore() {
     const scoreDisplay = document.getElementById('score');
     scoreDisplay.textContent = `Score: ${score.toString().padStart(5, '0')}`;
+}
+
+
+// Function to dynamically spawn WTCs at decreasing intervals
+function spawnWTCs() {
+    createWTC(); // Spawn a single WTC
+
+    // Reduce spawn interval over time for increased difficulty
+    if (spawnInterval > 500) {
+        spawnInterval -= 5; // Reduce interval by 50ms each time, minimum of 500ms
+    }
+
+    // Use setTimeout to recursively call spawnWTCs with the updated interval
+    setTimeout(spawnWTCs, spawnInterval);
 }
 
 // Set initial styles and start the game
@@ -237,10 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
     plane.style.backgroundSize = 'cover';
     plane.style.backgroundRepeat = 'no-repeat';
 
-    // Spawn WTCs at regular intervals
-    setInterval(() => {
-        createWTC();
-    }, spawnInterval);
+    // // Spawn WTCs at regular intervals
+    // setInterval(() => {
+    //     createWTC();
+    // }, spawnInterval);
+
+    spawnWTCs(); // Start spawning WTCs
 
     // Start moving the WTCs
     moveWTCs();
